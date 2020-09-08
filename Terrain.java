@@ -6,6 +6,8 @@ import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.concurrent.atomic.*;
+import java.util.concurrent.locks.*;
 /** Creates a terrain object which loads in the textfile contents into a single dimensional array, creates a greyscale bufferedimage object. */
 public class Terrain {
 
@@ -36,7 +38,7 @@ public class Terrain {
 	}
 	
 	// convert linear position into 2D location in grid
-	void locate(int pos, int [] ind)
+	synchronized void locate(int pos, int [] ind)
 	{
 		ind[0] = (int) pos / dimy; // x
 		ind[1] = pos % dimy; // y	
@@ -84,7 +86,7 @@ public class Terrain {
 	
 	// find permuted 2D location from a linear index in the
 	// range [0, dimx*dimy)
-	void getPermute(int i, int [] loc) {
+	synchronized void getPermute(int i, int [] loc) {
 		locate(permute.get(i), loc);
 	}
 	

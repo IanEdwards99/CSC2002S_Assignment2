@@ -22,7 +22,8 @@ public class Flow {
 	static int frameX;
 	static int frameY;
 	static FlowPanel fp;
-	final static int blocksize = 5;
+	final static int blocksize = 10;
+	final static int threadNr = 4;
 
 
 	// start timer
@@ -45,11 +46,20 @@ public class Flow {
       	JPanel g = new JPanel();
         g.setLayout(new BoxLayout(g, BoxLayout.PAGE_AXIS)); 
    
-		fp = new FlowPanel(landdata, water);
-		fp.setPreferredSize(new Dimension(frameX,frameY));
-		Thread fpt = new Thread(fp);
+		FlowPanel[] fp = new FlowPanel[4];
+		int hi = 0;
 
-		g.add(fp);
+		Thread [] fpt = new Thread[threadNr];
+		for (int k=0; k<threadNr; k++){
+			if (k == threadNr - 1)
+				hi = ((k+1)*landdata.dim()/threadNr) - 1;
+			else hi = ((k+1)*landdata.dim()/threadNr);
+			fp[k] = new FlowPanel(landdata, water, (k*landdata.dim()/(threadNr)), hi);
+			fp[k].setPreferredSize(new Dimension(frameX,frameY));
+			fpt[k] = new Thread(fp[k]);
+			
+		}
+		g.add(fp[0]);
 	    
 		// to do: add a MouseListener, buttons and ActionListeners on those buttons
 		   
@@ -74,7 +84,8 @@ public class Flow {
 		endB.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				// to do ask threads to stop
-				fp.setRun(false);
+				for (int k=0; k<threadNr; k++){
+				fp[k].setRun(false);}
 				frame.dispose();
 				//fpt.stop();
 				System.exit(0);
@@ -82,19 +93,22 @@ public class Flow {
 		});
 		resetB.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				fp.SetPause(true);
+				for (int k=0; k<threadNr; k++){
+				fp[k].SetPause(true);}
 				water.reset(landdata);
 				g.repaint();
 			}
 		});
 		playB.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				fp.SetPause(false);
+				for (int k=0; k<threadNr; k++){
+					fp[k].SetPause(false);}
 			}
 		});
 		pauseB.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				fp.SetPause(true);
+				for (int k=0; k<threadNr; k++){
+					fp[k].SetPause(true);}
 			}
 		});
 		
@@ -109,7 +123,10 @@ public class Flow {
       	frame.add(g); //add contents to window
         frame.setContentPane(g);
 		frame.setVisible(true);
-		fpt.start(); //Thread will start off with run method in PAUSED state.
+		for (int k = 0; k < threadNr; k++){
+			fpt[k].start(); //Thread will start off with run method in PAUSED state.
+		}					//possibly make new method to create threads and ???
+		
 	}
 	
 		

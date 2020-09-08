@@ -7,17 +7,20 @@ import javax.swing.JPanel;
 
 public class FlowPanel extends JPanel implements Runnable {
 	Terrain land; Water water;
+	int lo; int hi;
 	Boolean stop = false, paused = true;
 
-	FlowPanel(Terrain terrain, Water water) {
+	FlowPanel(Terrain terrain, Water water, int lo, int hi) {
 		land=terrain;
 		this.water = water;
+		this.lo = lo;
+		this.hi = hi;
 	}
 		
 	// responsible for painting the terrain and water
 	// as images
 	@Override
-    protected void paintComponent(Graphics g) {
+    protected void paintComponent(Graphics g) { //doesnt need to be synchronized as it is only called for a single thread as it will paint the shared water image.
 		int width = getWidth();
 		int height = getHeight();
 		super.paintComponent(g);
@@ -47,21 +50,23 @@ public class FlowPanel extends JPanel implements Runnable {
 					nextBasin[0] = 0; nextBasin[1] = 0;
 					land.getPermute(i, pos); //using i-th index iterating through linear array of positions, return in pos x and y coordinates.
 					if (water.getDepth(pos[0],pos[1]) > 0){
-						if (pos[0] == 0 || pos[0] == land.getDimX()-1 || pos[1] == 0 || pos[1] == land.getDimY()-1){ //if water on border, decolor, decrease depth and water surface level.
-							water.decolorImage(pos[0], pos[1]);
-							repaint();
-						}
-						else{
-							nextBasin = determineLowNearby(pos[0], pos[1]); //find the lowest neighbour.
-							water.colorImage(nextBasin[0], nextBasin[1]);
-							water.decolorImage(pos[0], pos[1]);
-							repaint();
+						synchronized (this) {
+							if (pos[0] == 0 || pos[0] == land.getDimX()-1 || pos[1] == 0 || pos[1] == land.getDimY()-1){ //if water on border, decolor, decrease depth and water surface level.
+								water.decolorImage(pos[0], pos[1]);
+								repaint();
+							}
+							else{
+								nextBasin = determineLowNearby(pos[0], pos[1]); //find the lowest neighbour.
+								water.colorImage(nextBasin[0], nextBasin[1]);
+								water.decolorImage(pos[0], pos[1]);
+								repaint();
+							}
 						}
 					}
 				
-				if (i >= 0 && i < land.dim()-1)
+				if (i >= lo && i < hi) //land.dim() -1
 					i++;
-				else i = 0;
+				else i = lo;
 				
 			}
 			
