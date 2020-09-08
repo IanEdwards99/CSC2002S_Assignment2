@@ -6,7 +6,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
-
+/** Creates a terrain object which loads in the textfile contents into a single dimensional array, creates a greyscale bufferedimage object. */
 public class Terrain {
 
 	float [][] height; // regular grid of height values
@@ -41,6 +41,11 @@ public class Terrain {
 		ind[0] = (int) pos / dimy; // x
 		ind[1] = pos % dimy; // y	
 	}
+// to paint on mouseclick or any other event.
+	void changeImage(int x, int y){
+		Color blue = Color.BLUE;
+		img.setRGB(x,y, blue.getRGB());
+	}
 	
 	// convert height values to greyscale colour and populate an image
 	void deriveImage()
@@ -62,6 +67,7 @@ public class Terrain {
 			for(int y=0; y < dimy; y++) {
 				 // find normalized height value in range
 				 float val = (height[x][y] - minh) / (maxh - minh);
+				 //System.out.println("val = " + val);
 				 Color col = new Color(val, val, val, 1.0f);
 				 img.setRGB(x, y, col.getRGB());
 			}
@@ -117,5 +123,9 @@ public class Terrain {
 			System.out.println("Malformed input file "+fileName);
 			e.printStackTrace();
 		}
+	}
+
+	public float getHeight(int x, int y){
+		return height[x][y];
 	}
 }
