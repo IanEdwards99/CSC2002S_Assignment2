@@ -25,8 +25,9 @@ public class Flow {
 	final static int blocksize = 10;
 	final static int threadNr = 4;
 
-
 	// start timer
+	/** Creates a tick method used alongside the tock method to calculate how long an operation will take.
+	 */
 	private static void tick(){
 		startTime = System.currentTimeMillis();
 	}
@@ -36,6 +37,13 @@ public class Flow {
 		return (System.currentTimeMillis() - startTime) / 1000.0f; 
 	}
 	
+	/** setupGUI creates the GUI, starts the threads and implements a mouseListener and various button functionality.
+	 * 
+	 * @param frameX Width of frame.
+	 * @param frameY Height of frame.
+	 * @param landdata terrain object storing the heights of terrain in a 2D grid and builds a grayscale image from it.
+	 * @param water Water object storing water surface heights at each terrain position in a 2D grid, used to draw blue blocks of water.
+	 */
 	public static void setupGUI(int frameX,int frameY,Terrain landdata, Water water) {
 
 		Dimension fsize = new Dimension(800, 800);
@@ -57,7 +65,6 @@ public class Flow {
 			fp[k] = new FlowPanel(landdata, water, (k*landdata.dim()/(threadNr)), hi);
 			fp[k].setPreferredSize(new Dimension(frameX,frameY));
 			fpt[k] = new Thread(fp[k]);
-			
 		}
 		g.add(fp[0]);
 	    
@@ -70,6 +77,9 @@ public class Flow {
 		JButton resetB = new JButton("Reset");
 		JButton pauseB = new JButton("Pause");
 		JButton playB = new JButton("Play");
+		JLabel label = new JLabel();
+		fp[0].counter = new JLabel();
+
 		g.addMouseListener(new MouseInputAdapter(){
 			public void mousePressed(MouseEvent me){ 
 				int x = me.getX();
@@ -96,6 +106,8 @@ public class Flow {
 				for (int k=0; k<threadNr; k++){
 				fp[k].SetPause(true);}
 				water.reset(landdata);
+				fp[0].count.set(0);
+				fp[0].counter.setText(Integer.toString(fp[0].count.get()));
 				g.repaint();
 			}
 		});
@@ -111,11 +123,15 @@ public class Flow {
 					fp[k].SetPause(true);}
 			}
 		});
-		
+		label.setText("Simulation step:");
+		fp[0].counter.setText("0");
+
 		b.add(resetB);
 		b.add(pauseB);
 		b.add(playB);
 		b.add(endB);
+		b.add(label);
+		b.add(fp[0].counter);
 		g.add(b);
     	
 		frame.setSize(frameX, frameY+50);	// a little extra space at the bottom for buttons
@@ -125,11 +141,14 @@ public class Flow {
 		frame.setVisible(true);
 		for (int k = 0; k < threadNr; k++){
 			fpt[k].start(); //Thread will start off with run method in PAUSED state.
-		}					//possibly make new method to create threads and ???
-		
+			//fpt[k].join();
+		}
 	}
 	
-		
+		/**
+		 * main method reads in heights from input file and builds a new terrain and water object as well as gets the required dimensions followed by building a GUI for the program.
+		 * @param args takes in the textfile of data containing the terrain heights.
+		 */
 	public static void main(String[] args) {
 		Terrain landdata = new Terrain();
 		
@@ -145,6 +164,8 @@ public class Flow {
 		// 
 		landdata.readData(args[0]);
 		
+				
+		// to do: initialise and start simulation
 		
 		frameX = landdata.getDimX();
 		frameY = landdata.getDimY();
@@ -152,8 +173,7 @@ public class Flow {
 		water.deriveImage();
 		water.calcWaterSurf(landdata);
 		SwingUtilities.invokeLater(()->setupGUI(frameX, frameY, landdata, water));
-		
-		// to do: initialise and start simulation
+
 	}
 
 }

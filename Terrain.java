@@ -126,7 +126,11 @@ public class Terrain {
 			e.printStackTrace();
 		}
 	}
-
+	/** return the height of the terrain in a given x and y position, when looping through the heights to determine water surface at each point.
+	 * @param x is the x position in question.
+	 * @param y is the y position of the grid in question.
+	 * @return height at the inputted position.
+	 */
 	public float getHeight(int x, int y){
 		return height[x][y];
 	}
