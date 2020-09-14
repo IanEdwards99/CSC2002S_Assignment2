@@ -1,9 +1,7 @@
-package FlowSkeleton;
+//package FlowSkeleton;
 
 import java.awt.image.*;
-
-import FlowSkeleton.Terrain;
-import java.util.concurrent.atomic.*;
+import java.util.concurrent.atomic.*; 
 import java.util.concurrent.locks.*;
 import java.awt.Color;
 /** Water class is used to create a water object to store water depths and water surface heights in a 2D grid identical in size to the grid made for the terrain object.
@@ -47,10 +45,10 @@ public class Water {
  * @param y is the y grid position in question.
  */
     synchronized public void decolorImage(int x, int y){
-        img.setRGB(x,y, Color.TRANSLUCENT);
         if (depths[x][y] > 0){ //decolor only parts of image that have color...
         depths[x][y] -= 1;
         waterSurf[x][y] -= 0.01;}
+        if (depths[x][y] < 1) img.setRGB(x,y, Color.TRANSLUCENT);
     }
 /** Creates a new image for the water object to be used there on out. Sets it as translucent as it is an empty water object at first with no water to display. */
     void deriveImage(){
@@ -87,7 +85,7 @@ public class Water {
  * @param y grid y coordinate.
  * @return returns a float height value.
  */
-    synchronized public float getWaterSurf(int x, int y){
+    public float getWaterSurf(int x, int y){
         return waterSurf[x][y];
     }
     /** getDepth returns the depth of water above the terrain at each position.
@@ -95,7 +93,7 @@ public class Water {
  * @param y grid y coordinate.
  * @return returns a float height value.
  */
-    synchronized public int getDepth(int x, int y){
+    public int getDepth(int x, int y){
         return depths[x][y];
     }
 }

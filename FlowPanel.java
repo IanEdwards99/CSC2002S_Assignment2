@@ -1,4 +1,4 @@
-package FlowSkeleton;
+//package FlowSkeleton;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
@@ -75,7 +75,6 @@ public class FlowPanel extends JPanel implements Runnable {
 						}
 					}
 					i++;
-					//counter.setText(Integer.toString(count.getAndIncrement()));
 				}
 				
 			

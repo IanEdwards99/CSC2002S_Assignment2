@@ -1,4 +1,4 @@
-package FlowSkeleton;
+//package FlowSkeleton;
 
 /** The flow class creates the GUI (setting up the JFrame etc), adds various buttons and the mouseListener. Also initializes and starts thread simulation. */
 
@@ -22,8 +22,8 @@ public class Flow {
 	static int frameX;
 	static int frameY;
 	static FlowPanel[] fp; 
-	final static int blocksize = 10;
-	final static int threadNr = 4;
+	static int blocksize = 10;
+	static int threadNr = 4;
 	static Boolean stopped = false;
 	static int count = 0;
 	static JLabel counter;
