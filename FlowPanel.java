@@ -9,9 +9,9 @@ import javax.swing.JLabel;
 public class FlowPanel extends JPanel implements Runnable {
 	Terrain land; Water water;
 	int lo; int hi;
-	Boolean stop = false, paused = true;
-	public static AtomicInteger count;
-	public static JLabel counter;
+	public Boolean stop = false; Boolean paused = true;
+	//public static AtomicInteger count;
+	//public static JLabel counter;
 /** Constructor for the FlowPanel class which initializes local variables.
  * 
  * @param terrain a terrain object storing heights of terrain in a 2D array.
@@ -24,7 +24,7 @@ public class FlowPanel extends JPanel implements Runnable {
 		this.water = water;
 		this.lo = lo;
 		this.hi = hi;
-		count = new AtomicInteger(0);
+		//count = new AtomicInteger(0);
 	}
 		
 	// responsible for painting the terrain and water
@@ -48,8 +48,8 @@ public class FlowPanel extends JPanel implements Runnable {
 		// display loop here
 		// to do: this should be controlled by the GUI
 		// to allow stopping and starting
-		int[] pos = new int[2]; //int[0] is x and int[1] is y.
 		int i = lo;
+		int[] pos = new int[2]; //int[0] is x and int[1] is y.
 		int[] nextBasin = new int[2];
 
 		while (i < hi){
@@ -66,25 +66,18 @@ public class FlowPanel extends JPanel implements Runnable {
 						
 							if (pos[0] == 0 || pos[0] == land.getDimX()-1 || pos[1] == 0 || pos[1] == land.getDimY()-1){ //if water on border, decolor, decrease depth and water surface level.
 								water.decolorImage(pos[0], pos[1]);
-								repaint();
 							}
 							else{
 								nextBasin = determineLowNearby(pos[0], pos[1]); //find the lowest neighbour.
 								water.colorImage(nextBasin[0], nextBasin[1]);
 								water.decolorImage(pos[0], pos[1]);
-								repaint();
 							}
 						}
 					}
-
-				if (i >= lo && i < hi) //land.dim() -1
 					i++;
-				else {
-					i = lo;
-					counter.setText(Integer.toString(count.getAndIncrement()));
+					//counter.setText(Integer.toString(count.getAndIncrement()));
 				}
 				
-			}
 			
 		}
 	    

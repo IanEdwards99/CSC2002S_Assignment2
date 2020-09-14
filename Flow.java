@@ -21,9 +21,12 @@ public class Flow {
 	static long startTime = 0;
 	static int frameX;
 	static int frameY;
-	static FlowPanel fp;
+	static FlowPanel[] fp; 
 	final static int blocksize = 10;
 	final static int threadNr = 4;
+	static Boolean stopped = false;
+	static int count = 0;
+	static JLabel counter;
 
 	// start timer
 	/** Creates a tick method used alongside the tock method to calculate how long an operation will take.
@@ -53,24 +56,9 @@ public class Flow {
     	
       	JPanel g = new JPanel();
         g.setLayout(new BoxLayout(g, BoxLayout.PAGE_AXIS)); 
-   
-		FlowPanel[] fp = new FlowPanel[4];
-		int hi = 0;
-
-		Thread [] fpt = new Thread[threadNr];
-		for (int k=0; k<threadNr; k++){
-			if (k == threadNr - 1)
-				hi = ((k+1)*landdata.dim()/threadNr) - 1;
-			else hi = ((k+1)*landdata.dim()/threadNr);
-			fp[k] = new FlowPanel(landdata, water, (k*landdata.dim()/(threadNr)), hi);
-			fp[k].setPreferredSize(new Dimension(frameX,frameY));
-			fpt[k] = new Thread(fp[k]);
-		}
 		g.add(fp[0]);
 	    
 		// to do: add a MouseListener, buttons and ActionListeners on those buttons
-		   
-		
 		JPanel b = new JPanel();
 	    b.setLayout(new BoxLayout(b, BoxLayout.LINE_AXIS));
 		JButton endB = new JButton("End");;
@@ -78,7 +66,7 @@ public class Flow {
 		JButton pauseB = new JButton("Pause");
 		JButton playB = new JButton("Play");
 		JLabel label = new JLabel();
-		fp[0].counter = new JLabel();
+		counter = new JLabel();
 
 		g.addMouseListener(new MouseInputAdapter(){
 			public void mousePressed(MouseEvent me){ 
@@ -93,11 +81,10 @@ public class Flow {
 		// add the listener to the jbutton to handle the "pressed" event
 		endB.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				// to do ask threads to stop
 				for (int k=0; k<threadNr; k++){
 				fp[k].setRun(false);}
+				stopped = true;
 				frame.dispose();
-				//fpt.stop();
 				System.exit(0);
 			}
 		});
@@ -106,32 +93,34 @@ public class Flow {
 				for (int k=0; k<threadNr; k++){
 				fp[k].SetPause(true);}
 				water.reset(landdata);
-				fp[0].count.set(0);
-				fp[0].counter.setText(Integer.toString(fp[0].count.get()));
+				count = 0;
+				counter.setText(Integer.toString(count));
 				g.repaint();
 			}
 		});
 		playB.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				for (int k=0; k<threadNr; k++){
-					fp[k].SetPause(false);}
+					fp[k].SetPause(false);
+					}
 			}
 		});
 		pauseB.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				for (int k=0; k<threadNr; k++){
-					fp[k].SetPause(true);}
+					fp[k].SetPause(true);
+					}
 			}
 		});
 		label.setText("Simulation step:");
-		fp[0].counter.setText("0");
+		counter.setText("0");
 
 		b.add(resetB);
 		b.add(pauseB);
 		b.add(playB);
 		b.add(endB);
 		b.add(label);
-		b.add(fp[0].counter);
+		b.add(counter);
 		g.add(b);
     	
 		frame.setSize(frameX, frameY+50);	// a little extra space at the bottom for buttons
@@ -139,10 +128,6 @@ public class Flow {
       	frame.add(g); //add contents to window
         frame.setContentPane(g);
 		frame.setVisible(true);
-		for (int k = 0; k < threadNr; k++){
-			fpt[k].start(); //Thread will start off with run method in PAUSED state.
-			//fpt[k].join();
-		}
 	}
 	
 		/**
@@ -161,19 +146,49 @@ public class Flow {
 		}
 				
 		// landscape information from file supplied as argument
-		// 
 		landdata.readData(args[0]);
 		
-				
-		// to do: initialise and start simulation
-		
+		//Initialize
 		frameX = landdata.getDimX();
 		frameY = landdata.getDimY();
 		Water water = new Water(frameX, frameY);
 		water.deriveImage();
 		water.calcWaterSurf(landdata);
+		MakeThreadObjects(landdata, water);
 		SwingUtilities.invokeLater(()->setupGUI(frameX, frameY, landdata, water));
+		Thread [] fpt = new Thread[threadNr];
 
+		//Start simulation:
+		while (!stopped){
+			for (int k = 0; k < threadNr; k++){
+				fpt[k] = new Thread(fp[k]);
+				fpt[k].start(); //Thread will start off with run method in PAUSED state.
+			}
+			for (int k = 0; k < threadNr; k++){ 
+				try
+				{ 
+					fpt[k].join();
+					
+				} 
+				catch(Exception ex) {}
+			}
+			count++;
+			counter.setText(Integer.toString(count));
+			fp[0].repaint();
+		}
+	}
+	public static void MakeThreadObjects(Terrain landdata, Water water){
+		fp = new FlowPanel[4];
+		int hi = 0;
+
+		for (int k=0; k<threadNr; k++){
+			if (k == threadNr - 1)
+				hi = ((k+1)*landdata.dim()/threadNr) - 1;
+			else hi = ((k+1)*landdata.dim()/threadNr);
+
+			fp[k] = new FlowPanel(landdata, water, (k*landdata.dim()/(threadNr)), hi);
+			fp[k].setPreferredSize(new Dimension(frameX,frameY));
+		}
 	}
 
 }
