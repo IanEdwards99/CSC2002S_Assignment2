@@ -1,8 +1,4 @@
-//package FlowSkeleton;
-
 import java.awt.image.*;
-import java.util.concurrent.atomic.*; 
-import java.util.concurrent.locks.*;
 import java.awt.Color;
 /** Water class is used to create a water object to store water depths and water surface heights in a 2D grid identical in size to the grid made for the terrain object.
  * The class then can color/decolor parts of the water image and update depths accordingly.
@@ -12,6 +8,9 @@ public class Water {
     BufferedImage img; // greyscale image for displaying the terrain top-down
     int [][] depths;
     float [][] waterSurf;
+    public static int waterclick = 0;
+    public static int watermove = 0;
+    public static int wateredge = 0;
     /** instantiates the water object
      * @param dimx is the width of the required array.
      * @param dimy is the height of the required array.

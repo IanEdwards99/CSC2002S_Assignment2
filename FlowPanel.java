@@ -1,5 +1,3 @@
-//package FlowSkeleton;
-
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 import java.awt.Graphics;
@@ -10,8 +8,8 @@ public class FlowPanel extends JPanel implements Runnable {
 	Terrain land; Water water;
 	int lo; int hi;
 	public Boolean stop = false; Boolean paused = true;
-	//public static AtomicInteger count;
-	//public static JLabel counter;
+	public static Boolean backgroundpainted = false;
+
 /** Constructor for the FlowPanel class which initializes local variables.
  * 
  * @param terrain a terrain object storing heights of terrain in a 2D array.
@@ -24,7 +22,6 @@ public class FlowPanel extends JPanel implements Runnable {
 		this.water = water;
 		this.lo = lo;
 		this.hi = hi;
-		//count = new AtomicInteger(0);
 	}
 		
 	// responsible for painting the terrain and water
@@ -36,18 +33,15 @@ public class FlowPanel extends JPanel implements Runnable {
 		int width = getWidth();
 		int height = getHeight();
 		super.paintComponent(g);
-		
-		// draw the landscape in greyscale as an image
+
+		// draw the landscape in greyscale as an image and water ontop of that.
 		if (land.getImage() != null){
 			g.drawImage(land.getImage(), 0, 0, null);
 			g.drawImage(water.getImage(),0,0,null);
 		}
 	}
-	/** When a thread starts, its run method will run indefinitely, until the program ends. It features a while loop that either continues to the next loop iteration if paused is set, or evaluates water positions and transfers water if it is not paused. */
+	/** When a thread starts, its run method will while loop until the index variable reaches the end of its assigned range. The loop either continues to the next loop iteration if paused is set, or evaluates water positions and transfers water if it is not paused. */
 	public void run() {	
-		// display loop here
-		// to do: this should be controlled by the GUI
-		// to allow stopping and starting
 		int i = lo;
 		int[] pos = new int[2]; //int[0] is x and int[1] is y.
 		int[] nextBasin = new int[2];
@@ -66,6 +60,8 @@ public class FlowPanel extends JPanel implements Runnable {
 						
 							if (pos[0] == 0 || pos[0] == land.getDimX()-1 || pos[1] == 0 || pos[1] == land.getDimY()-1){ //if water on border, decolor, decrease depth and water surface level.
 								water.decolorImage(pos[0], pos[1]);
+								Water.wateredge++;
+								Water.watermove--;
 							}
 							else{
 								nextBasin = determineLowNearby(pos[0], pos[1]); //find the lowest neighbour.
@@ -82,7 +78,6 @@ public class FlowPanel extends JPanel implements Runnable {
 	    
 	}
 /** The SetPause method is used to change the boolean variable in this object and thus thread in order to "pause" the program and make the while loop loop through iterations of no functionality in order to simulate a pause but with threads still running.
- * 
  * @param paused boolean passed in from the button click handler.
  */
 	public void SetPause(boolean paused){

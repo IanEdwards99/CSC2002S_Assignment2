@@ -1,21 +1,12 @@
-//package FlowSkeleton;
-
 /** The flow class creates the GUI (setting up the JFrame etc), adds various buttons and the mouseListener. Also initializes and starts thread simulation. */
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
-
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.event.MouseAdapter; //bring in the MouseAdaptor package.
 import java.awt.event.MouseEvent;
-import java.awt.image.*; //for creating color for water
-import java.awt.*;
-import java.util.*;
-import java.util.concurrent.atomic.*;
 
 public class Flow {
 	static long startTime = 0;
@@ -73,9 +64,11 @@ public class Flow {
 				int x = me.getX();
 				int y = me.getY();
 				for (int i = -blocksize/2; i <= blocksize/2; i++){
-					for (int j = -blocksize/2; j <= blocksize/2; j++){water.colorImage(x+i, y+j);}
+					for (int j = -blocksize/2; j <= blocksize/2; j++){water.colorImage(x+i, y+j); Water.waterclick++; Water.watermove++; }
 				}
 				g.repaint();
+				//Line added to check conservation of water.
+				//System.out.println("Water on click: " + Water.waterclick + " Water in grid: " + Water.watermove + " Water edges: " + Water.wateredge + " Grid and Edges: " + (Water.wateredge + Water.watermove));
 			}
 		});
 		// add the listener to the jbutton to handle the "pressed" event
@@ -96,6 +89,10 @@ public class Flow {
 				count = 0;
 				counter.setText(Integer.toString(count));
 				g.repaint();
+				//Variables added to check conservation of water.
+				// Water.waterclick = 0;
+				// Water.wateredge = 0;
+				// Water.watermove = 0;
 			}
 		});
 		playB.addActionListener(new ActionListener(){
@@ -109,6 +106,8 @@ public class Flow {
 			public void actionPerformed(ActionEvent e){
 				for (int k=0; k<threadNr; k++){
 					fp[k].SetPause(true);
+					//Line added to check conservation of water.
+					//System.out.println("Water on click: " + Water.waterclick + " Water in grid: " + Water.watermove + " Water edges: " + Water.wateredge + " Grid and Edges: " + (Water.wateredge + Water.watermove));
 					}
 			}
 		});

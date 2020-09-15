@@ -1,13 +1,9 @@
-//package FlowSkeleton;
-
 import java.io.File;
 import java.awt.image.*;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.concurrent.atomic.*;
-import java.util.concurrent.locks.*;
 /** Creates a terrain object which loads in the textfile contents into a single dimensional array, creates a greyscale bufferedimage object. */
 public class Terrain {
 
